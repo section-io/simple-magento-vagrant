@@ -68,9 +68,15 @@ mysql -u root -e "FLUSH PRIVILEGES"
 
 # Download and extract
 if [[ ! -f "/vagrant/httpdocs/index.php" ]]; then
+
+  if [[ ! -f "/vagrant/magento-${DATA_VERSION}.tar.gz" ]]; then
+    # Only download Magento if we need to
+    cd /vagrant
+    wget http://www.magentocommerce.com/downloads/assets/${MAGE_VERSION}/magento-${MAGE_VERSION}.tar.gz --progress dot:mega
+  fi
+
   cd /vagrant/httpdocs
-  wget http://www.magentocommerce.com/downloads/assets/${MAGE_VERSION}/magento-${MAGE_VERSION}.tar.gz
-  tar -zxvf magento-${MAGE_VERSION}.tar.gz
+  tar -zxvf ../magento-${MAGE_VERSION}.tar.gz
   mv magento/* magento/.htaccess .
   chmod -R o+w media var
   chmod o+w app/etc
