@@ -126,7 +126,7 @@ wget http://files.magerun.net/n98-magerun-latest.phar -O n98-magerun.phar --prog
 sudo mv ./n98-magerun.phar /usr/local/bin/
 chmod +x /usr/local/bin/n98-magerun.phar
 
-n98-magerun.phar extension:install Nexcessnet_Turpentine --root-dir /vagrant/httpdocs/
-#Seems to need a cache clean agter extension install, otherwise TURPENTINE doesn't appear in Admin Panel 
-#https://github.com/nexcess/magento-turpentine/wiki/FAQ
-n98-magerun.phar cache:clean --root-dir /vagrant/httpdocs/
+#Install Nexcessnet_Turpentine extension
+sudo -u www-data n98-magerun.phar extension:install Nexcessnet_Turpentine --root-dir /vagrant/httpdocs/
+#Must cache clean after extension install, otherwise TURPENTINE doesn't appear in Admin Panel - https://github.com/nexcess/magento-turpentine/wiki/FAQ
+sudo -u www-data n98-magerun.phar cache:clean --root-dir /vagrant/httpdocs/
