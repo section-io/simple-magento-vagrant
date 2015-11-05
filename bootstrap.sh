@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -xe
 
 SAMPLE_DATA=$1
 MAGE_VERSION="1.9.1.0"
