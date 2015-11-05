@@ -69,15 +69,17 @@ mysql -u root -e "FLUSH PRIVILEGES"
 # Download and extract
 if [[ ! -f "/vagrant/httpdocs/index.php" ]]; then
 
-  if [[ ! -f "/vagrant/magento-${DATA_VERSION}.tar.gz" ]]; then
+  if [[ ! -f "/vagrant/magento-${MAGE_VERSION}.tar.gz" ]]; then
     # Only download Magento if we need to
     cd /vagrant
-    wget http://www.magentocommerce.com/downloads/assets/${MAGE_VERSION}/magento-${MAGE_VERSION}.tar.gz --progress dot:mega
+    wget https://github.com/OpenMage/magento-mirror/archive/${MAGE_VERSION}.tar.gz --progress dot:mega --output-document=magento-${MAGE_VERSION}.tar.gz
+    #Magento now want you to register for latest versions
+    #wget http://www.magentocommerce.com/downloads/assets/${MAGE_VERSION}/magento-${MAGE_VERSION}.tar.gz --progress dot:mega
   fi
 
   cd /vagrant/httpdocs
   tar -zxvf ../magento-${MAGE_VERSION}.tar.gz
-  mv magento/* magento/.htaccess .
+  mv magento-mirror-${MAGE_VERSION}/* magento-mirror-${MAGE_VERSION}/.htaccess .
   chmod -R o+w media var
   chmod o+w app/etc
   # Clean up downloaded file and extracted dir
@@ -91,6 +93,7 @@ if [[ $SAMPLE_DATA == "true" ]]; then
 
   if [[ ! -f "/vagrant/magento-sample-data-${DATA_VERSION}.tar.gz" ]]; then
     # Only download sample data if we need to
+    # Magento now want you to register for latest versions & don't offer a direct download
     wget http://www.magentocommerce.com/downloads/assets/${DATA_VERSION}/magento-sample-data-${DATA_VERSION}.tar.gz --progress dot:giga
   fi
 
