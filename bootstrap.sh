@@ -137,5 +137,9 @@ chmod +x /vagrant/httpdocs/mage
 #Install doesn't run (can't download/search) when not root
 n98-magerun.phar extension:install Nexcessnet_Turpentine --root-dir /vagrant/httpdocs/
 
+#Enable the Turpentine caches
+n98-magerun.phar cache:enable turpentine_pages --root-dir /vagrant/httpdocs/
+n98-magerun.phar cache:enable turpentine_esi_blocks --root-dir /vagrant/httpdocs/
+
 #Must cache clean after extension install, otherwise TURPENTINE doesn't appear in Admin Panel - https://github.com/nexcess/magento-turpentine/wiki/FAQ
 sudo -u www-data n98-magerun.phar cache:clean --root-dir /vagrant/httpdocs/
