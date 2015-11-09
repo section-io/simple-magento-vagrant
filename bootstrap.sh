@@ -6,6 +6,9 @@ DATA_VERSION="1.9.1.0"
 DEFAULT_BASE_URL="http://127.0.0.1:8080/"
 BASE_URL=${2:-$DEFAULT_BASE_URL}
 MAGENTO_ADMIN_PASSWORD=${3:-password123123}
+SECTION_IO_USERNAME=${4:-username@example.com}
+SECTION_IO_PASSWORD=${5:-secret}
+SECTION_IO_ENPOINT=${6:-https://aperture.section.io/api/v1/account/0/application/0/state}
 
 # Update Apt
 # --------------------
@@ -143,3 +146,29 @@ n98-magerun.phar cache:enable turpentine_esi_blocks --root-dir /vagrant/httpdocs
 
 #Must cache clean after extension install, otherwise TURPENTINE doesn't appear in Admin Panel - https://github.com/nexcess/magento-turpentine/wiki/FAQ
 sudo -u www-data n98-magerun.phar cache:clean --root-dir /vagrant/httpdocs/
+
+#Install varnish-cli-bridge binary
+mkdir -p /opt/varnish-cli-bridge
+cd /opt/varnish-cli-bridge
+wget https://github.com/section-io/varnish-cli-bridge/releases/download/v0.1.2/varnish-cli-bridge-v0.1.2-linux-amd64.tar.gz
+tar -xvzf varnish-cli-bridge-*-linux-amd64.tar.gz
+touch /opt/varnish-cli-bridge/secret_file
+
+
+#Install supervisor and configure to run varnish-cli-bridge
+apt-get install supervisor
+SUPERVISORCONF=$(cat <<EOF
+[program:varnish-cli-bridge]
+command=/opt/varnish-cli-bridge/varnish-cli-bridge -api-endpoint "$SECTION_IO_ENDPOINT" -username "$SECTION_IO_USERNAME" -secret-file /opt/varnish-cli-bridge/secret_file
+environment=SECTION_IO_PASSWORD="$SECTION_IO_PASSWORD"
+directory=/usr/local/bin
+autostart=true
+autorestart=true
+startretries=20
+stderr_logfile=/var/log/varnish-cli-bridge-err.log
+stdout_logfile=/var/log/varnish-cli-bridge-stdout.log
+user=www-data
+EOF
+)
+echo "$SUPERVISORCONF" > /etc/supervisor/conf.d/varnish-cli-bridge.conf
+service supervisor restart
