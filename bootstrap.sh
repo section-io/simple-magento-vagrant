@@ -8,7 +8,7 @@ BASE_URL=${2:-$DEFAULT_BASE_URL}
 MAGENTO_ADMIN_PASSWORD=${3:-password123123}
 SECTION_IO_USERNAME=${4:-username@example.com}
 SECTION_IO_PASSWORD=${5:-secret}
-SECTION_IO_ENPOINT=${6:-https://aperture.section.io/api/v1/account/0/application/0/state}
+SECTION_IO_ENDPOINT=${6:-https://aperture.section.io/api/v1/account/0/application/0/state}
 
 # Update Apt
 # --------------------
