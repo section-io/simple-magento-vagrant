@@ -5,7 +5,7 @@ MAGE_VERSION="1.9.1.0"
 DATA_VERSION="1.9.1.0"
 DEFAULT_BASE_URL="http://127.0.0.1:8080/"
 BASE_URL=${2:-$DEFAULT_BASE_URL}
-ADMIN_PASSWORD=${G3:-password123123}
+MAGENTO_ADMIN_PASSWORD=${3:-password123123}
 
 # Update Apt
 # --------------------
@@ -119,7 +119,7 @@ if [ ! -f "/vagrant/httpdocs/app/etc/local.xml" ]; then
   --use_secure no --secure_base_url "$BASE_URL" --use_secure_admin no \
   --skip_url_validation yes \
   --admin_lastname Owner --admin_firstname Store --admin_email "admin@example.com" \
-  --admin_username admin --admin_password "$ADMIN_PASSWORD"
+  --admin_username admin --admin_password "$MAGENTO_ADMIN_PASSWORD"
   /usr/bin/php -f shell/indexer.php reindexall
 fi
 
