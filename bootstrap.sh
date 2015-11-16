@@ -5,10 +5,12 @@ MAGE_VERSION="1.9.1.0"
 DATA_VERSION="1.9.1.0"
 DEFAULT_BASE_URL="http://127.0.0.1:8080/"
 BASE_URL=${2:-$DEFAULT_BASE_URL}
-MAGENTO_ADMIN_PASSWORD=${3:-password123123}
-SECTION_IO_USERNAME=${4:-username@example.com}
-SECTION_IO_PASSWORD=${5:-secret}
-SECTION_IO_ENDPOINT=${6:-https://aperture.section.io/api/v1/account/0/application/0/state}
+DEFAULT_BASE_URL_SECURE="http://127.0.0.1:8443/"
+BASE_URL_SECURE=${3:-$DEFAULT_BASE_URL_SECURE}
+MAGENTO_ADMIN_PASSWORD=${4:-password123123}
+SECTION_IO_USERNAME=${5:-username@example.com}
+SECTION_IO_PASSWORD=${6:-secret}
+SECTION_IO_ENDPOINT=${7:-https://aperture.section.io/api/v1/account/0/application/0/state}
 
 # Update Apt
 # --------------------
@@ -29,6 +31,9 @@ rm -rf /var/www/html
 mkdir /vagrant/httpdocs
 ln -fs /vagrant/httpdocs /var/www/html
 
+#Make self signed cert
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /var/www/server.key -out /var/www/server.crt -subj "/C=/ST=/L=/O=/CN=selfsigned"
+
 # Replace contents of default Apache vhost
 # --------------------
 VHOST=$(cat <<EOF
@@ -40,6 +45,21 @@ Listen 8080
   <Directory "/var/www/html">
     AllowOverride All
   </Directory>
+</VirtualHost>
+<VirtualHost *:443>
+  DocumentRoot "/var/www/html"
+  ServerName localhost
+  <Directory "/var/www/html">
+    AllowOverride All
+  </Directory>
+  SSLEngine on
+  SSLProtocol all -SSLv2
+  SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5
+  SSLCertificateFile "/var/www/server.crt"
+  SSLCertificateKeyFile "/var/www/server.key"
+  #SetEnvIf Ssl-Offloaded 1 HTTPS=on
+  #AddHeader "Ssl-Offloaded: 1"
+  RequestHeader append Ssl-Offloaded "1"
 </VirtualHost>
 <VirtualHost *:8080>
   DocumentRoot "/var/www/html"
@@ -53,6 +73,8 @@ EOF
 
 echo "$VHOST" > /etc/apache2/sites-enabled/000-default.conf
 
+a2enmod ssl
+a2enmod headers
 a2enmod rewrite
 service apache2 restart
 
@@ -119,7 +141,7 @@ if [ ! -f "/vagrant/httpdocs/app/etc/local.xml" ]; then
   --locale en_US --timezone "America/Los_Angeles" --default_currency USD \
   --db_host localhost --db_name magentodb --db_user magentouser --db_pass password \
   --url "$BASE_URL" --use_rewrites yes \
-  --use_secure no --secure_base_url "$BASE_URL" --use_secure_admin no \
+  --use_secure no --secure_base_url "$BASE_URL_SECURE" --use_secure_admin no \
   --skip_url_validation yes \
   --admin_lastname Owner --admin_firstname Store --admin_email "admin@example.com" \
   --admin_username admin --admin_password "$MAGENTO_ADMIN_PASSWORD"
@@ -173,3 +195,8 @@ EOF
 )
 echo "$SUPERVISORCONF" > /etc/supervisor/conf.d/varnish-cli-bridge.conf
 service supervisor restart
+#Set new offload header as per Turpentine
+mysql -u root -e "update magentodb.core_config_data set value=\"HTTP_SSL_OFFLOADED\" where path = \"web/secure/offloader_header\""
+
+#Cache flush after config change
+sudo -u www-data n98-magerun.phar cache:flush --root-dir /vagrant/httpdocs/
