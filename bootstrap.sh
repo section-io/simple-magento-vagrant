@@ -179,7 +179,7 @@ touch /opt/varnish-cli-bridge/secret_file
 
 
 #Install supervisor and configure to run varnish-cli-bridge
-apt-get install supervisor
+apt-get install -y supervisor
 SUPERVISORCONF=$(cat <<EOF
 [program:varnish-cli-bridge]
 command=/opt/varnish-cli-bridge/varnish-cli-bridge -api-endpoint "$SECTION_IO_ENDPOINT" -username "$SECTION_IO_USERNAME" -secret-file /opt/varnish-cli-bridge/secret_file
