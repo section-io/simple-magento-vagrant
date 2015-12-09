@@ -173,16 +173,15 @@ n98-magerun.phar cache:enable turpentine_esi_blocks --root-dir /vagrant/httpdocs
 #Install varnish-cli-bridge binary
 mkdir -p /opt/varnish-cli-bridge
 cd /opt/varnish-cli-bridge
-wget https://github.com/section-io/varnish-cli-bridge/releases/download/untagged-338f6fc05161162bf331/varnish-cli-bridge-0.2.0-linux-amd64.tar.gz
+wget https://github.com/section-io/varnish-cli-bridge/releases/download/v0.2.0/varnish-cli-bridge-v0.2.0-linux-amd64.tar.gz
 tar -xvzf varnish-cli-bridge-*-linux-amd64.tar.gz
-touch /opt/varnish-cli-bridge/secret_file
 
 
 #Install supervisor and configure to run varnish-cli-bridge
 apt-get install -y supervisor
 SUPERVISORCONF=$(cat <<EOF
 [program:varnish-cli-bridge]
-command=/opt/varnish-cli-bridge/varnish-cli-bridge -api-endpoint "$SECTION_IO_ENDPOINT" -username "$SECTION_IO_USERNAME" -secret-file /opt/varnish-cli-bridge/secret_file
+command=/opt/varnish-cli-bridge/varnish-cli-bridge -api-endpoint "$SECTION_IO_ENDPOINT" -username "$SECTION_IO_USERNAME"
 environment=SECTION_IO_PASSWORD="$SECTION_IO_PASSWORD"
 directory=/usr/local/bin
 autostart=true
