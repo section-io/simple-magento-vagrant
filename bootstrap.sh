@@ -173,7 +173,7 @@ n98-magerun.phar cache:enable turpentine_esi_blocks --root-dir /vagrant/httpdocs
 #Install varnish-cli-bridge binary
 mkdir -p /opt/varnish-cli-bridge
 cd /opt/varnish-cli-bridge
-wget https://github.com/section-io/varnish-cli-bridge/releases/download/v0.1.3/varnish-cli-bridge-v0.1.3-linux-amd64.tar.gz
+wget https://github.com/section-io/varnish-cli-bridge/releases/download/untagged-338f6fc05161162bf331/varnish-cli-bridge-0.2.0-linux-amd64.tar.gz
 tar -xvzf varnish-cli-bridge-*-linux-amd64.tar.gz
 touch /opt/varnish-cli-bridge/secret_file
 
